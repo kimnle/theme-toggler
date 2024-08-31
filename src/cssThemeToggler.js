@@ -1,5 +1,8 @@
 console.log("CSS Theme Toggler loaded and running!");
 
+let rootElement = document.querySelector(":root");
+let themeToggleButton = document.getElementById("themeToggle");
+
 let themes = [
     {
         name: "dark",
@@ -31,6 +34,7 @@ function getChosenTheme() {
 // and update CSS variables based on that name
 function setChosenTheme(newThemeName) {
     localStorage.setItem("theme", newThemeName);
+    updateCSSVariables();
 }
 
 if (getChosenTheme() == null) {
@@ -43,7 +47,23 @@ if (getChosenTheme() == null) {
       // Theme set to light.
       setChosenTheme("light");
       console.log("No theme found, applied the light theme");
-      
+
+    }
+} else {
+    // If a theme DOES exist in local storage,
+    // apply that theme's properties
+    updateCSSVariables()
+}
+
+function updateButtonText() {
+    // Read the current theme
+    if (getChosenTheme() == "dark") {
+        // Change button text to say other theme
+        themeToggleButton.innerText = "Change theme to Light";
+
+    } else {
+        themeToggleButton.innerText = "Change theme to Dark";
+
     }
 }
 
@@ -53,13 +73,14 @@ function toggleTheme() {
     if (getChosenTheme() == "dark") {
         // set it to light
         setChosenTheme("light");
+        // Set button text to "Change theme to Dark"
     } else {
         // set it to dark
         setChosenTheme("dark");
+        // Set button text to "Change theme to Light"
     }
 }
 
-let themeToggleButton = document.getElementById("themeToggle");
 themeToggleButton.onclick = toggleTheme;
 // themeToggleButton.addEventListener("click", toggleTheme);
 
@@ -67,10 +88,24 @@ themeToggleButton.onclick = toggleTheme;
 // Loop through properties key in chosen theme object
 // and apply those properties to CSS
 function updateCSSVariables() {
+    // Find the matching theme object
+    let matchingTheme = themes.find(themeObject => themeObject.name == getChosenTheme());
+    console.log(matchingTheme);
 
+    // Find the properties object in the matching theme object
+    // Loop through all properties
+    Object.keys(matchingTheme.properties).forEach(cssProperty => {
+        console.log(cssProperty + ": " + matchingTheme.properties[cssProperty]);
+
+        // Apply property value to CSS variables 
+        rootElement.style.setProperty(`--${cssProperty}`, matchingTheme.properties[cssProperty]);
+    })
+    // for (const cssProperty of matchingTheme.properties) {
+    //     console.log(cssProperty);
+    // }
+
+    updateButtonText();
 }
-
-let rootElement = document.querySelector(":root");
 
 function getVariablesFromCSS() {
     console.log(rootElement);
